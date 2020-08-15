@@ -1,1 +1,2 @@
-A PHP Minecraft Yggdrasil Server For My Minecraft Server
+#PHP-Yggdrasil-Server
+A PHP Based Minecraft Yggdrasil Server for My Minecraft Server
