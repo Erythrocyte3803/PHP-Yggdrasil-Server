@@ -44,11 +44,11 @@ class database {
         }
     }
     function isAvailable($email) {
-        $ret = $this->query("select * from pre_ucenter_members where email = '".$email."'");
+        $ret = $this->query("select * from members where email = '".$email."'");
         return $ret;
     }
     function chkPasswd($email,$passwd) {
-        $ret = $this->query("select * from pre_ucenter_members where email = '".$email."'");
+        $ret = $this->query("select * from members where email = '".$email."'");
         $ucpass = $ret[0][2];
         $salt = $ret[0][10];
         $playername = $ret[0][1];
@@ -62,10 +62,10 @@ class database {
         }
     }
     function updateUser($email,$userid) {
-        $this->query_change("update pre_ucenter_members set lastlogintime = '".time()."', userid = '".$userid."' where email = '".$email."'");
+        $this->query_change("update members set lastlogintime = '".time()."', userid = '".$userid."' where email = '".$email."'");
     }
     function getUserid($email) {
-        $ret = $this->query("select * from pre_ucenter_members where email = '".$email."'");
+        $ret = $this->query("select * from members where email = '".$email."'");
         if (!$ret) {
             return false;
         } else {
@@ -74,16 +74,16 @@ class database {
     }
     function creToken($cli_token,$userid) {
         $acctoken = UUID::getUserUuid(uniqid().$cli_token);
-        $ret = $this->query("select * from pre_ucenter_tokens where owner_uuid = '".$userid."'");
+        $ret = $this->query("select * from tokens where owner_uuid = '".$userid."'");
         if (!$ret) {
-            $this->query_change("insert into pre_ucenter_tokens (acc_token, cli_token, state, owner_uuid) values ('".$acctoken."', '".$cli_token."', 1, '".$userid."');");
+            $this->query_change("insert into tokens (acc_token, cli_token, state, owner_uuid) values ('".$acctoken."', '".$cli_token."', 1, '".$userid."');");
         } else {
-            $this->query_change("update pre_ucenter_tokens set acc_token = '".$acctoken."', cli_token = '".$cli_token."', state = 1 where owner_uuid = '".$userid."'");
+            $this->query_change("update tokens set acc_token = '".$acctoken."', cli_token = '".$cli_token."', state = 1 where owner_uuid = '".$userid."'");
         }
 
     }
     function getTokensByOwner($userid) {
-        $ret = $this->query("select * from pre_ucenter_tokens where owner_uuid = '".$userid."'");
+        $ret = $this->query("select * from tokens where owner_uuid = '".$userid."'");
         if (!ret) {
             return false;
         } else {
@@ -91,10 +91,10 @@ class database {
         }
     }
     function crePlayerUuid($playeruuid,$email,$playername) {
-        $ret = $this->query("select * from pre_ucenter_members where email = '".$email."'");
+        $ret = $this->query("select * from members where email = '".$email."'");
         $uuid = $ret[0][14];
         if ($uuid == "") {
-            $this->query_change("update pre_ucenter_members set uuid = '".$playeruuid."' where email = '".$email."'");
+            $this->query_change("update members set uuid = '".$playeruuid."' where email = '".$email."'");
             $this->addPlayerInfo($playername,$playeruuid);
         } else {
             $playeruuid = $uuid;
@@ -102,7 +102,7 @@ class database {
         }
     }
     function getProfileByOwner($userid) {
-        $ret = $this->query("select * from pre_ucenter_members where userid = '".$userid."'");
+        $ret = $this->query("select * from members where userid = '".$userid."'");
         if (!$ret) {
             return false;
         } else {
@@ -110,10 +110,10 @@ class database {
         }
     }
     function porfileToken($acctoken,$player_uuid) {
-        $this->query_change("update pre_ucenter_tokens set profile = '".$player_uuid."' where acc_token = '".$acctoken."'");
+        $this->query_change("update tokens set profile = '".$player_uuid."' where acc_token = '".$acctoken."'");
     }
     function getUseridByAcctoken($acctoken) {
-        $ret = $this->query("select * from pre_ucenter_tokens where acc_token = '".$acctoken."'");
+        $ret = $this->query("select * from tokens where acc_token = '".$acctoken."'");
         if (!$ret) {
             return false;
         } else {
@@ -121,7 +121,7 @@ class database {
         }
     }
     function isAcctokenAvailable($acctoken) {
-        $ret = $this->query("select * from pre_ucenter_tokens where acc_token = '".$acctoken."'");
+        $ret = $this->query("select * from tokens where acc_token = '".$acctoken."'");
         if (!$ret) {
             return false;
         } else {
@@ -129,7 +129,7 @@ class database {
         }
     }
     function chkAcctoken($acctoken,$clitoken) {
-        $ret = $this->query("select * from pre_ucenter_tokens where acc_token = '".$acctoken."'");
+        $ret = $this->query("select * from tokens where acc_token = '".$acctoken."'");
         if (!$ret) {
             return false;
         } else {
@@ -137,7 +137,7 @@ class database {
         }
     }
     function getTokenState($acctoken) {
-        $ret = $this->query("select * from pre_ucenter_tokens where acc_token = '".$acctoken."'");
+        $ret = $this->query("select * from tokens where acc_token = '".$acctoken."'");
         if (!$ret) {
             return false;
         } else {
@@ -145,18 +145,18 @@ class database {
         }
     }
     function setTokenState($acctoken) {
-        $this->query_change("update pre_ucenter_tokens set state = -1 where acc_token = '".$acctoken."'");
+        $this->query_change("update tokens set state = -1 where acc_token = '".$acctoken."'");
     }
     function killTokensByOwner($userid) {
-        $this->query_change("update pre_ucenter_tokens set state = -1 where owner_uuid = '".$userid."'");
+        $this->query_change("update tokens set state = -1 where owner_uuid = '".$userid."'");
     }
     function updateAllTokenState() {
-        $this->query_change("update pre_ucenter_tokens set state = 0 where ptime <= date_sub(now(),interval 120 minute);");
-        $this->query_change("update pre_ucenter_tokens set state = -1 where ptime <= date_sub(now(),interval 10 days);");
-        return $this->query_change("delete from pre_ucenter_tokens where state = -1");
+        $this->query_change("update tokens set state = 0 where ptime <= date_sub(now(),interval 120 minute);");
+        $this->query_change("update tokens set state = -1 where ptime <= date_sub(now(),interval 10 days);");
+        return $this->query_change("delete from tokens where state = -1");
     }
     function chkProfileToken($acctoken,$player_uuid) {
-        $ret = $this->query("select * from pre_ucenter_tokens where acc_token = '".$acctoken."'");
+        $ret = $this->query("select * from tokens where acc_token = '".$acctoken."'");
         if (!$ret) {
             return false;
         } else {
@@ -164,10 +164,10 @@ class database {
         }
     }
     function creSession($server_id,$acc_token,$ip) {
-        $this->query_change("insert into pre_ucenter_sessions (server_id, acc_token, ipaddr, o_time) values ('".$server_id."','".$acc_token."','".$ip."', now())");
+        $this->query_change("insert into sessions (server_id, acc_token, ipaddr, o_time) values ('".$server_id."','".$acc_token."','".$ip."', now())");
     }
     function chkSession($playername,$serverid,$ipaddr) {
-        $ret = $this->query("select * from pre_ucenter_sessions where server_id = '".$serverid."'");
+        $ret = $this->query("select * from sessions where server_id = '".$serverid."'");
         if (!$ret) {
             return false;
         } else {
@@ -178,7 +178,7 @@ class database {
         }
     }
     function getAcctokenByServerid($serverid) {
-        $ret = $this->query("select * from pre_ucenter_sessions where server_id = '".$serverid."'");
+        $ret = $this->query("select * from sessions where server_id = '".$serverid."'");
         if (!$ret) {
             return false;
         } else {
@@ -186,7 +186,7 @@ class database {
         }
     }
     function getProfileByUuid($playeruuid) {
-        $ret = $this->query("select * from pre_ucenter_members where uuid = '".$playeruuid."'");
+        $ret = $this->query("select * from members where uuid = '".$playeruuid."'");
         if (!$ret) {
             return false;
         } else {
@@ -194,7 +194,7 @@ class database {
         }
     }
     function getProfileByPlayer($playername) {
-        $ret = $this->query("select * from pre_ucenter_members where username = '".$playername."'");
+        $ret = $this->query("select * from members where username = '".$playername."'");
         if (!$ret) {
             return false;
         } else {
@@ -202,22 +202,22 @@ class database {
         }
     }
     function updateAllSessionState() {
-        $this->query_change("delete from pre_ucenter_sessions where date(o_time) <= date_sub(now(),interval 30 second);");
+        $this->query_change("delete from sessions where date(o_time) <= date_sub(now(),interval 30 second);");
     }
     function updateSkinData($uuid) {
         $texturedata = file_get_contents("https://api.zhjlfx.cn/?type=getjson&uuid=".$uuid);
-        $this->query_change("update pre_ucenter_members set texturedata = '".$texturedata."' where uuid = '".$uuid."'");
+        $this->query_change("update members set texturedata = '".$texturedata."' where uuid = '".$uuid."'");
     }
     function addPlayerInfo($playername,$playeruuid) {
-        $ret = $this->query("select * from pre_ucenter_chkname where uuid = '".$playeruuid."'");
+        $ret = $this->query("select * from chkname where uuid = '".$playeruuid."'");
         if (!$ret) {
-            $this->query_change("insert into pre_ucenter_chkname (uuid, playername) values ('".$playeruuid."', '".$playername."')");
+            $this->query_change("insert into chkname (uuid, playername) values ('".$playeruuid."', '".$playername."')");
         } else {
-            $this->query_change("update pre_ucenter_chkname set playername = '".$playername."' where uuid = '".$playeruuid."'");
+            $this->query_change("update chkname set playername = '".$playername."' where uuid = '".$playeruuid."'");
         }
     }
     function getPlayerUuidByAcctoken($acctoken) {
-        $ret = $this->query("select * from pre_ucenter_tokens where acc_token = '".$acctoken."'");
+        $ret = $this->query("select * from tokens where acc_token = '".$acctoken."'");
         if (!$ret) {
             return false;
         } else {
@@ -225,8 +225,8 @@ class database {
         }
     }
     function isPlayerNameChanged($uuid) {
-        $getname = $this->query("select * from pre_ucenter_members where uuid = '".$uuid."'");
-        $getsavedname = $this->query("select * from pre_ucenter_chkname where uuid = '".$uuid."'");
+        $getname = $this->query("select * from members where uuid = '".$uuid."'");
+        $getsavedname = $this->query("select * from chkname where uuid = '".$uuid."'");
         $rs = ($getname[0][1] !== $getsavedname[0][1]);
         if ($getname && $getsavedname) {
             return $rs;
