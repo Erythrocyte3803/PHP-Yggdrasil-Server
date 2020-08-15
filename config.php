@@ -15,6 +15,6 @@ $privatekey = file_get_contents($_SERVER['DOCUMENT_ROOT'] ."/keys/yggdrasil-priv
 //外置登录服务器数据库配置//
 $host = 'localhost'; //数据库地址
 $port = 3306; //数据库端口
-$user = 'root'; //数据库用户名
-$pass = 'Ec22zbaW8kf3FNBS'; //数据库密码
-$dbname = 'ucenter'; //数据库名
+$user = 'your dbusername'; //数据库用户名
+$pass = 'your dbpass'; //数据库密码
+$dbname = 'your database'; //数据库名
