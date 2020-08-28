@@ -44,28 +44,34 @@ class database {
         }
     }
     function isAvailable($email) {
-        $ret = $this->query("select * from members where email = '".$email."'");
+        $ret = $this->query("select * from users where email = '".$email."'");
         return $ret;
     }
     function chkPasswd($email,$passwd) {
-        $ret = $this->query("select * from members where email = '".$email."'");
+        $ret = $this->query("select * from users where email = '".$email."'");
         $ucpass = $ret[0][2];
         $salt = $ret[0][10];
         $playername = $ret[0][1];
         $playeruuid = UUID::getUserUuid($playername);
+        $skinuuid = file_get_contents("https://api.zhjlfx.cn/?type=getuuid&method=email&email=".$email);
         $encrypted = md5(md5($passwd).$salt);
         $rs = ($encrypted == $ucpass);
         if ($rs) {
-            $this->crePlayerUuid($playeruuid,$email,$playername);
-            //$this->updateSkinData($email,$playername);
-            return $rs;
+            if ($skinuuid == '') {
+                $this->crePlayerUuid($playeruuid,$email,$playername);
+                return $rs;
+            } else {
+                $this->crePlayerUuid($skinuuid,$email,$playername);
+                return $rs;
+            }
+
         }
     }
     function updateUser($email,$userid) {
-        $this->query_change("update members set lastlogintime = '".time()."', userid = '".$userid."' where email = '".$email."'");
+        $this->query_change("update users set lastlogintime = '".time()."', userid = '".$userid."' where email = '".$email."'");
     }
     function getUserid($email) {
-        $ret = $this->query("select * from members where email = '".$email."'");
+        $ret = $this->query("select * from users where email = '".$email."'");
         if (!$ret) {
             return false;
         } else {
@@ -91,10 +97,10 @@ class database {
         }
     }
     function crePlayerUuid($playeruuid,$email,$playername) {
-        $ret = $this->query("select * from members where email = '".$email."'");
+        $ret = $this->query("select * from users where email = '".$email."'");
         $uuid = $ret[0][14];
         if ($uuid == "") {
-            $this->query_change("update members set uuid = '".$playeruuid."' where email = '".$email."'");
+            $this->query_change("update users set uuid = '".$playeruuid."' where email = '".$email."'");
             $this->addPlayerInfo($playername,$playeruuid);
         } else {
             $playeruuid = $uuid;
@@ -102,7 +108,7 @@ class database {
         }
     }
     function getProfileByOwner($userid) {
-        $ret = $this->query("select * from members where userid = '".$userid."'");
+        $ret = $this->query("select * from users where userid = '".$userid."'");
         if (!$ret) {
             return false;
         } else {
@@ -186,7 +192,7 @@ class database {
         }
     }
     function getProfileByUuid($playeruuid) {
-        $ret = $this->query("select * from members where uuid = '".$playeruuid."'");
+        $ret = $this->query("select * from users where uuid = '".$playeruuid."'");
         if (!$ret) {
             return false;
         } else {
@@ -194,7 +200,7 @@ class database {
         }
     }
     function getProfileByPlayer($playername) {
-        $ret = $this->query("select * from members where username = '".$playername."'");
+        $ret = $this->query("select * from users where username = '".$playername."'");
         if (!$ret) {
             return false;
         } else {
@@ -206,7 +212,7 @@ class database {
     }
     function updateSkinData($uuid) {
         $texturedata = file_get_contents("https://api.zhjlfx.cn/?type=getjson&uuid=".$uuid);
-        $this->query_change("update members set texturedata = '".$texturedata."' where uuid = '".$uuid."'");
+        $this->query_change("update users set texturedata = '".$texturedata."' where uuid = '".$uuid."'");
     }
     function addPlayerInfo($playername,$playeruuid) {
         $ret = $this->query("select * from chkname where uuid = '".$playeruuid."'");
@@ -225,7 +231,7 @@ class database {
         }
     }
     function isPlayerNameChanged($uuid) {
-        $getname = $this->query("select * from members where uuid = '".$uuid."'");
+        $getname = $this->query("select * from users where uuid = '".$uuid."'");
         $getsavedname = $this->query("select * from chkname where uuid = '".$uuid."'");
         $rs = ($getname[0][1] !== $getsavedname[0][1]);
         if ($getname && $getsavedname) {

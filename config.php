@@ -13,8 +13,8 @@ $regurl = "https://reg.zhjlfx.cn"; //玩家注册地址
 $publickey = file_get_contents($_SERVER['DOCUMENT_ROOT'] ."/keys/yggdrasil-public-key.pem"); //公钥文件
 $privatekey = file_get_contents($_SERVER['DOCUMENT_ROOT'] ."/keys/yggdrasil-private-key.pem"); //私钥文件
 //外置登录服务器数据库配置//
-$host = 'localhost'; //数据库地址
+$host = 'your mysql host'; //数据库地址
 $port = 3306; //数据库端口
-$user = 'your dbusername'; //数据库用户名
-$pass = 'your dbpass'; //数据库密码
-$dbname = 'your database'; //数据库名
+$user = 'your mysql user'; //数据库用户名
+$pass = 'your mysql pass'; //数据库密码
+$dbname = 'user database'; //数据库名
