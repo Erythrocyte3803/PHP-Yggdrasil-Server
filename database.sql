@@ -1,10 +1,10 @@
 -- phpMyAdmin SQL Dump
--- version 4.9.1
+-- version 4.9.5
 -- https://www.phpmyadmin.net/
 --
--- 主机： localhost
--- 生成日期： 2020-08-15 23:00:56
--- 服务器版本： 10.4.8-MariaDB-log
+-- 主机： mysql.zhjlfx.cn
+-- 生成日期： 2020-08-28 20:39:29
+-- 服务器版本： 10.3.17-MariaDB
 -- PHP 版本： 5.6.40
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -19,8 +19,10 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- 数据库： `ucenter`
+-- 数据库： `minecraft`
 --
+CREATE DATABASE IF NOT EXISTS `minecraft` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `minecraft`;
 
 -- --------------------------------------------------------
 
@@ -37,11 +39,11 @@ CREATE TABLE `chkname` (
 -- --------------------------------------------------------
 
 --
--- 表的结构 `members`
+-- 表的结构 `users`
 --
 
-DROP TABLE IF EXISTS `members`;
-CREATE TABLE `members` (
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
   `uid` mediumint(8) UNSIGNED NOT NULL,
   `username` char(50) NOT NULL DEFAULT '',
   `password` char(32) NOT NULL DEFAULT '',
@@ -109,6 +111,19 @@ CREATE TABLE `tokens` (
   `owner_uuid` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `vailtoken`
+--
+
+DROP TABLE IF EXISTS `vailtoken`;
+CREATE TABLE `vailtoken` (
+  `id` int(10) NOT NULL,
+  `token` varchar(255) DEFAULT NULL,
+  `vtime` int(10) NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 --
 -- 转储表的索引
 --
@@ -121,9 +136,9 @@ ALTER TABLE `chkname`
   ADD UNIQUE KEY `playername` (`playername`);
 
 --
--- 表的索引 `members`
+-- 表的索引 `users`
 --
-ALTER TABLE `members`
+ALTER TABLE `users`
   ADD PRIMARY KEY (`uid`),
   ADD UNIQUE KEY `username` (`username`),
   ADD UNIQUE KEY `userid` (`userid`),
@@ -148,13 +163,19 @@ ALTER TABLE `tokens`
   ADD PRIMARY KEY (`acc_token`) USING BTREE;
 
 --
+-- 表的索引 `vailtoken`
+--
+ALTER TABLE `vailtoken`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- 在导出的表使用AUTO_INCREMENT
 --
 
 --
--- 使用表AUTO_INCREMENT `members`
+-- 使用表AUTO_INCREMENT `users`
 --
-ALTER TABLE `members`
+ALTER TABLE `users`
   MODIFY `uid` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
@@ -162,6 +183,12 @@ ALTER TABLE `members`
 --
 ALTER TABLE `texturedata`
   MODIFY `tid` int(10) NOT NULL AUTO_INCREMENT;
+
+--
+-- 使用表AUTO_INCREMENT `vailtoken`
+--
+ALTER TABLE `vailtoken`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
