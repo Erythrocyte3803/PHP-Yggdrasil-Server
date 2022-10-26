@@ -1,4 +1,4 @@
-<?php
+  <?php
 require_once($_SERVER['DOCUMENT_ROOT'].'/inc/include.php');
 if ($_SERVER["REQUEST_URI"] != "/") {
     $requri = explode("?",$_SERVER["REQUEST_URI"])[0];
